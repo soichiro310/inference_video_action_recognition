@@ -29,13 +29,15 @@ def renderResult():
     toc = time.time()
     
     sorted_indices = np.argsort(pred)[::-1]
-
-    print('inference time:',round(toc-tic,3),'sec')
-    print('\nTop classes and probabilities')
-    for index in sorted_indices[:20]:
-        print(pred[index], cls_model.classes[index])
-        
-    return render_template("result.html")
+    print_results_str = []
+    for index in sorted_indices[:10]:
+        print_results_str.append('{} {}'.format(cls_model.classes[index], round(pred[index]*100.0,3)))
+    
+    return render_template("result.html",
+                           best_result = cls_model.classes[sorted_indices[0]],
+                           time = round(toc-tic,3),
+                           results = print_results_str
+                          )
 
 
 if __name__ == "__main__":
