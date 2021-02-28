@@ -6,10 +6,16 @@
     </head>
     <body class="text-center">
     <h2>事前学習済みDNNモデルを用いた動画分類アプリ</h2>
+        
     <form action="/result" method="POST" enctype="multipart/form-data">
 <!-- 		<div>
 			<input type="file" name="upload_file" accept="video/*" required>
 		</div> -->
+        <select name="select_video">
+            {% for i in video_list %}
+                <option>{{i}}</option>
+            {% endfor %}
+		</select>
 		<div>
 			<input type="submit" value="分類を行う">
 		</div>

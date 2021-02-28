@@ -13,6 +13,11 @@ def get_parser():
                        default=8888
                        )
     
+    parser.add_argument('--sample_video_dir',
+                       type=str,
+                       default='./sample_video'
+                       )
+    
     return parser
 
 
