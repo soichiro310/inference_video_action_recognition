@@ -1,3 +1,5 @@
+# ソースコード出典：https://github.com/rimchang/kinetics-i3d-Pytorch/blob/master/model/I3D_Pytorch.py
+
 import torch.nn as nn
 import torch
 

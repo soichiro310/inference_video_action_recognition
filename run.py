@@ -13,11 +13,13 @@ app = Flask(__name__)
 
 args = get_parser().parse_args()
 
+# 推論モデルを定義
 cls_model = InferenceModel(model=I3D(),
                            weight_path='./data/weights/rgb_imagenet.pkl',
                            label_map_path='./data/label_map.txt',
                            use_device='cuda:0')
 
+# indexにリダイレクト
 @app.route("/")
 def redirectToIndex():
     return redirect(url_for('renderIndex'))
@@ -31,12 +33,16 @@ def renderIndex():
 
 @app.route("/result", methods=['POST'])
 def renderResult():
+    # プルダウンメニューで選択した動画のファイルパスを取得
     video_path = os.path.join(args.sample_video_dir,request.form.get('select_video'))
+
+    # 動画ファイルの前処理と推論
     tic = time.time()
     video = cls_model.preprocessVideo(video_path=video_path)
     pred, logits = cls_model.inference(video)
     toc = time.time()
     
+    # 結果を表示させるための文字列をprint_results_strに格納してレンダリング
     sorted_indices = np.argsort(pred)[::-1]
     print_results_str = []
     for index in sorted_indices[:10]:
@@ -50,5 +56,4 @@ def renderResult():
 
 
 if __name__ == "__main__":
-    
     app.run(debug=True, host=args.host, port=args.port, threaded=True)
