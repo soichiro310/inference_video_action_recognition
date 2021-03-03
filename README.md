@@ -23,7 +23,7 @@ python3 -m venv cpu_inference
 ```
 3. 仮想環境をアクティベート
 ```
-source cpu_inderence/bin/activate
+source cpu_inference/bin/activate
 ```
 4. パッケージのインストール
 ```
