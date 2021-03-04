@@ -5,7 +5,8 @@ def get_parser():
     
     parser.add_argument('--host',
                         type=str,
-                        help='select host(ip address) of execute app'
+                        help='select host(ip address) of execute app',
+                        default='127.0.0.1'
                        )
     
     parser.add_argument('--port',
