@@ -54,6 +54,5 @@ def renderResult():
                            results = print_results_str
                           )
 
-
 if __name__ == "__main__":
     app.run(debug=True, host=args.host, port=args.port, threaded=True)

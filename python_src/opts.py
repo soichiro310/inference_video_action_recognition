@@ -27,7 +27,6 @@ def get_parser():
     
     return parser
 
-
 # argparse debug 
 if __name__ == '__main__':
     args = get_parser().parse_args()
