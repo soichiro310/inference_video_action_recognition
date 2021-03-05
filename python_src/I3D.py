@@ -306,7 +306,7 @@ class I3D(nn.Module):
             nn.Conv3d(1024, num_classes, kernel_size=1, stride=1, bias=True),# (400, 8, 1, 1)
         )
         self.spatial_squeeze = spatial_squeeze
-        self.softmax = nn.Softmax()
+        self.softmax = nn.Softmax(dim=1)
 
     def forward(self, x):
         logits = self.features(x)
