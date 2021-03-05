@@ -32,14 +32,20 @@ def createApp(args):
     @app.route("/result", methods=['POST'])
     def renderResult():
         # プルダウンメニューで選択した動画のファイルパスを取得
-        video_path = os.path.join(args.sample_video_dir,request.form.get('select_video'))
+        try:
+            video_path = os.path.join(args.sample_video_dir,request.form.get('select_video'))
 
-        # 動画ファイルの前処理と推論
-        tic = time.time()
-        video = cls_model.preprocessVideo(video_path=video_path)
-        pred, logits = cls_model.inference(video)
-        toc = time.time()
-        
+            # 動画ファイルの推論
+            tic = time.time()
+            pred = cls_model.inferenceVideo(video_path=video_path)
+            toc = time.time()
+        except TypeError:
+            print('選択が誤っています')
+            return redirect(url_for('renderIndex'))
+        except Exception as e:
+            print(e)
+            return redirect(url_for('renderIndex'))
+
         # 結果を表示させるための文字列をprint_results_strに格納してレンダリング
         sorted_indices = np.argsort(pred)[::-1]
         print_results_str = []

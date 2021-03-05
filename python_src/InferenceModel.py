@@ -40,14 +40,13 @@ class InferenceModel():
         )
         
     
-    # 動画ファイルの前処理を行う
-    def preprocessVideo(self, video_path):
+    # 動画ファイル
+    def inferenceVideo(self, video_path):
         cap = cv2.VideoCapture(video_path)
         
         if not cap.isOpened():
-            print('open error')
-            return
-        
+            raise Exception('Video Open Failed')
+
         idx = 0
         frames = []
         
@@ -66,19 +65,13 @@ class InferenceModel():
         X = X.permute(1,0,2,3)
         X = X.unsqueeze(0)
         
-        return X
-    
-    # 深層学習モデルへデータ(torch.Tensor)を入力して推論結果を返す
-    def inference(self, input_tensor):
-        
         self.model.eval()
-        input_tensor = input_tensor.to(self.device)
+        X = X.to(self.device)
         
         with torch.no_grad():
-            out_predictions, out_logits = self.model(input_tensor)
+            out_predictions, _ = self.model(X)
             
             # torch.Tensor形式からnumpy形式へ変換
             out_predictions = out_predictions[0].cpu().numpy()
-            out_logits = out_logits[0].cpu().numpy()
         
-        return out_predictions, out_logits
+        return out_predictions
