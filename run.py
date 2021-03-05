@@ -15,7 +15,7 @@ def createApp(args):
     cls_model = InferenceModel(model=I3D(),
                             weight_path='./data/weights/rgb_imagenet.pkl',
                             label_map_path='./data/label_map.txt',
-                            use_device=args.device)
+                            )
 
     # indexにリダイレクト
     @app.route("/")
