@@ -23,9 +23,9 @@ class InferenceModel():
             self.model.load_state_dict(torch.load(weight_path))
         
         self.classes = [x.strip() for x in open(label_map_path)] if label_map_path is not None else []
-        
+
         if len(self.classes) == 0:
-            raise Exception('self.classes is empty')
+            raise Exception('label map is empty')
 
         # 入力データの前処理において行われる変換
         self.transform = transforms.Compose(
