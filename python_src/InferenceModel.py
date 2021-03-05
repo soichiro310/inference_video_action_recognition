@@ -9,7 +9,9 @@ from PIL import Image
 
 class InferenceModel():
     def __init__(self, model, weight_path=None, label_map_path=None, use_device='cpu'):
-        self.model = model.to(torch.device(use_device))
+
+        self.device = torch.device(use_device if torch.cuda.is_available() else 'cpu')
+        self.model = model.to(self.device)
         
         if weight_path is not None:
             self.model.load_state_dict(torch.load(weight_path))
@@ -27,7 +29,7 @@ class InferenceModel():
                 ),  # 正規化
             ]
         )
-        self.use_device = use_device
+        
     
     # 動画ファイルの前処理を行う
     def preprocessVideo(self, video_path):
@@ -61,7 +63,7 @@ class InferenceModel():
     def inference(self, input_tensor):
         
         self.model.eval()
-        input_tensor = input_tensor.to(torch.device(self.use_device))
+        input_tensor = input_tensor.to(self.device)
         
         with torch.no_grad():
             out_predictions, out_logits = self.model(input_tensor)
