@@ -8,9 +8,15 @@ import numpy as np
 from PIL import Image 
 
 class InferenceModel():
-    def __init__(self, model, weight_path=None, label_map_path=None, use_device='cpu'):
+    def __init__(self, model, weight_path=None, label_map_path=None):
 
-        self.device = torch.device(use_device if torch.cuda.is_available() else 'cpu')
+        if torch.cuda.is_available():
+            print(' * Use Device: gpu')
+            self.device = torch.device('cuda')
+        else :
+            print(' * Use Device: cpu')
+            self.device = torch.device('cpu')
+
         self.model = model.to(self.device)
         
         if weight_path is not None:
@@ -18,6 +24,9 @@ class InferenceModel():
         
         self.classes = [x.strip() for x in open(label_map_path)] if label_map_path is not None else []
         
+        if len(self.classes) == 0:
+            raise Exception('self.classes is empty')
+
         # 入力データの前処理において行われる変換
         self.transform = transforms.Compose(
             [

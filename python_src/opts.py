@@ -24,12 +24,6 @@ def get_parser():
                        default='./sample_video'
                        )
     
-    parser.add_argument('--device',
-                       type=str,
-                       default='cpu',
-                       help="'select device (cpu -> 'cpu', gpu -> 'cuda:0')"
-                       )
-    
     return parser
 
 # argparse debug 
