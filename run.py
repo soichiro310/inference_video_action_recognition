@@ -10,6 +10,7 @@ from flask import *
 from python_src.opts import get_parser
 from python_src.I3D import I3D
 from python_src.InferenceModel import InferenceModel
+from python_src.myException import *
 
 def createApp(args):
     app = Flask(__name__)
@@ -53,8 +54,9 @@ def createApp(args):
         except TypeError:   # プルダウンの初期値のまま，ボタンを押してしまうと起きてしまう例外
             session['error'] = '動画ファイル(.avi)を選択してください．'
             return redirect(url_for('renderIndex'))
-        except Exception as e:  # ファイルが開けなかった場合
-            session['error'] = '選択したファイル('+ request.form.get('select_video') +')が開けませんでした．'
+        except VideoOpenError:  
+            # ファイルが開けなかった場合，エラーメッセージを表示させる処理を行い，indexにリダイレクト
+            session['error'] = '選択したファイル('+ video_name +')が開けませんでした．'
             return redirect(url_for('renderIndex'))
 
         # 結果を表示させるための文字列をprint_results_strに格納してレンダリング

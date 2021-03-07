@@ -7,6 +7,8 @@ import cv2
 import numpy as np
 from PIL import Image 
 
+from python_src.myException import *
+
 class InferenceModel():
     def __init__(self, model, weight_path=None, label_map_path=None):
 
@@ -25,7 +27,7 @@ class InferenceModel():
         self.classes = [x.strip() for x in open(label_map_path)] if label_map_path is not None else []
 
         if len(self.classes) == 0:
-            raise Exception('label map is empty')
+            raise LabelMapSettingError('label map is empty')
 
         # 入力データの前処理において行われる変換
         self.transform = transforms.Compose(
@@ -40,12 +42,13 @@ class InferenceModel():
         )
         
     
-    # 動画ファイル
+    # 動画ファイルの前処理を行い，DNNモデルによる推論を行う
     def inferenceVideo(self, video_path):
         cap = cv2.VideoCapture(video_path)
         
+        # 動画ファイルが開けなかった場合，VideoOpenErrorを出す
         if not cap.isOpened():
-            raise Exception('Video Open Failed')
+            raise VideoOpenError('Video Open Failed')
 
         idx = 0
         frames = []
