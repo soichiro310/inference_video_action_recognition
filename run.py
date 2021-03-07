@@ -73,11 +73,14 @@ def createApp(args):
 
     @app.route("/result", methods=['GET', 'POST'])
     def renderResult():
-        return render_template("result.html",
-                            best_result = session['best_result'],
-                            time = session['time'],
-                            results = session['results']
-                            )
+        if 'best_result' not in session:
+            return redirect(url_for('renderIndex'))
+        else :
+            return render_template("result.html",
+                                best_result = session['best_result'],
+                                time = session['time'],
+                                results = session['results']
+                                )
 
     return app
 
