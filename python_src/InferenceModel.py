@@ -7,15 +7,22 @@ import cv2
 import numpy as np
 from PIL import Image 
 
+from python_src.myException import *
+
 class InferenceModel():
     def __init__(self, model, weight_path=None, label_map_path=None, use_device='cpu'):
-        self.model = model.to(torch.device(use_device))
+        
+        self.device = torch.device(use_device if torch.cuda.is_available() else 'cpu')
+        self.model = model.to(self.device)
         
         if weight_path is not None:
             self.model.load_state_dict(torch.load(weight_path))
         
         self.classes = [x.strip() for x in open(label_map_path)] if label_map_path is not None else []
-        
+
+        if len(self.classes) == 0:
+            raise LabelMapSettingError('label map is empty')
+
         # 入力データの前処理において行われる変換
         self.transform = transforms.Compose(
             [
@@ -27,47 +34,40 @@ class InferenceModel():
                 ),  # 正規化
             ]
         )
-        self.use_device = use_device
+        
     
-    # 動画ファイルの前処理を行う
-    def preprocessVideo(self, video_path):
+    # 動画ファイルの前処理を行い，DNNモデルによる推論を行う
+    def inferenceVideo(self, video_path):
+        # 動画ファイルを読み込む
         cap = cv2.VideoCapture(video_path)
         
+        # 動画ファイルが開けなかった場合，VideoOpenErrorを出す
         if not cap.isOpened():
-            print('open error')
-            return
-        
-        idx = 0
+            raise VideoOpenError('Video Open Failed')
+
         frames = []
-        
         while cap.isOpened():
-            idx += 1
             ret, frame = cap.read()
             if ret:
+                # 動画フレームをPIL形式に変換し，前処理を行う
                 pil_img = Image.fromarray(frame)
                 pil_img = self.transform(pil_img)
                 frames.append(pil_img)
             else:
                 break
         
-        # 深層学習モデルへ入力するための形式に変換
+        # DNNモデルへ入力するための形式に変換
         X = torch.stack(frames, dim=0)
         X = X.permute(1,0,2,3)
         X = X.unsqueeze(0)
+        X = X.to(self.device)
         
-        return X
-    
-    # 深層学習モデルへデータ(torch.Tensor)を入力して推論結果を返す
-    def inference(self, input_tensor):
-        
+        # 推論を行う
         self.model.eval()
-        input_tensor = input_tensor.to(torch.device(self.use_device))
-        
         with torch.no_grad():
-            out_predictions, out_logits = self.model(input_tensor)
+            out_predictions, _ = self.model(X)
             
-            # torch.Tensor形式からnumpy形式へ変換
+            # 推論結果をtorch.Tensor形式からnumpy形式へ変換
             out_predictions = out_predictions[0].cpu().numpy()
-            out_logits = out_logits[0].cpu().numpy()
         
-        return out_predictions, out_logits
+        return out_predictions

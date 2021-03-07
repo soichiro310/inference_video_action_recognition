@@ -8,11 +8,20 @@
 
 <body class="text-center">
     <h2>事前学習済みDNNモデルを用いた動画分類アプリ</h2>
-
-    <form action="/result" method="POST" enctype="multipart/form-data">
+    {% if error %}
+        <p class=error><strong>Error:</strong> {{ error }}
+    {% endif %}
+    <div class="container">
+        {% for message in get_flashed_messages() %}
+        <div class="alert alert-success">{{ message }}</div>
+        {% endfor %}
+        {% block body %}{% endblock %}
+    </div>
+    <form action="/post" method="POST" enctype="multipart/form-data" name="select_form">
         <select name="select_video">
-            {% for i in video_list %}
-            <option>{{i}}</option>
+            <option disabled selected>サンプル動画を選択してください</option>
+            {% for video in video_list %}
+            <option>{{video}}</option>
             {% endfor %}
         </select>
         <div>
