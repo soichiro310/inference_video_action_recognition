@@ -19,7 +19,7 @@
     </div>
     <form action="/post" method="POST" enctype="multipart/form-data" name="select_form">
         <select name="select_video">
-            <option value="null" disabled selected>サンプル動画を選択してください</option>
+            <option disabled selected>サンプル動画を選択してください</option>
             {% for video in video_list %}
             <option>{{video}}</option>
             {% endfor %}
