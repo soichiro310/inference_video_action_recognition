@@ -10,16 +10,9 @@ from PIL import Image
 from python_src.myException import *
 
 class InferenceModel():
-    def __init__(self, model, weight_path=None, label_map_path=None):
+    def __init__(self, model, weight_path=None, label_map_path=None, use_device='cpu'):
         
-        # cudaが使える環境であれば，cudaを使用する
-        if torch.cuda.is_available():
-            print(' * Use Device: GPU')
-            self.device = torch.device('cuda')
-        else :
-            print(' * Use Device: GPU')
-            self.device = torch.device('cpu')
-
+        self.device = torch.device(use_device if torch.cuda.is_available() else 'cpu')
         self.model = model.to(self.device)
         
         if weight_path is not None:

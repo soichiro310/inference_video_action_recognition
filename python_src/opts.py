@@ -6,23 +6,28 @@ def get_parser():
     parser.add_argument('--debug',
                         action='store_true',
                         default=False
-                       )
+                        )
 
     parser.add_argument('--host',
                         type=str,
                         help='select host(ip address) of execute app',
                         default='127.0.0.1'
-                       )
+                        )
     
     parser.add_argument('--port',
-                       type=int,
-                       default=8888
-                       )
+                        type=int,
+                        default=8888
+                        )
     
     parser.add_argument('--sample_video_dir',
-                       type=str,
-                       default='./sample_video'
-                       )
+                        type=str,
+                        default='./sample_video'
+                        )
+
+    parser.add_argument('--device',
+                        type=str,
+                        default='cpu'
+                        )
     
     return parser
 
