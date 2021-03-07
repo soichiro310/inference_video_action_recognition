@@ -31,7 +31,8 @@ def createApp(args):
 
     @app.route("/index", methods=['GET', 'POST'])
     def renderIndex():
-        video_list = [video_path.split('/')[-1] for video_path in glob.glob(os.path.join(args.sample_video_dir,'*.avi'))]
+        # コマンドライン引数で指定したディレクトリ内にある動画ファイルのファイルパスに関するリストを作成
+        video_list = [video_path.split('/')[-1] for video_path in glob.glob(os.path.join(args.sample_video_dir,'*.(avi|mp4)'))]
 
         # 選択したファイルに問題があった場合はエラーメッセージを表示させる
         error = session['error'] if 'error' in session else ''
@@ -51,8 +52,9 @@ def createApp(args):
             tic = time.time()
             pred = cls_model.inferenceVideo(video_path=video_path)
             toc = time.time()
-        except TypeError:   # プルダウンの初期値のまま，ボタンを押してしまうと起きてしまう例外
-            session['error'] = '動画ファイル(.avi)を選択してください．'
+        except TypeError:   
+            # プルダウンの初期値のまま，ボタンを押してしまうと起きてしまう例外
+            session['error'] = '動画ファイル(.avi or .mp4)を選択してください．'
             return redirect(url_for('renderIndex'))
         except VideoOpenError:  
             # ファイルが開けなかった場合，エラーメッセージを表示させる処理を行い，indexにリダイレクト
