@@ -11,12 +11,13 @@ from python_src.myException import *
 
 class InferenceModel():
     def __init__(self, model, weight_path=None, label_map_path=None):
-
+        
+        # cudaが使える環境であれば，cudaを使用する
         if torch.cuda.is_available():
-            print(' * Use Device: gpu')
+            print(' * Use Device: GPU')
             self.device = torch.device('cuda')
         else :
-            print(' * Use Device: cpu')
+            print(' * Use Device: GPU')
             self.device = torch.device('cpu')
 
         self.model = model.to(self.device)
@@ -44,37 +45,36 @@ class InferenceModel():
     
     # 動画ファイルの前処理を行い，DNNモデルによる推論を行う
     def inferenceVideo(self, video_path):
+        # 動画ファイルを読み込む
         cap = cv2.VideoCapture(video_path)
         
         # 動画ファイルが開けなかった場合，VideoOpenErrorを出す
         if not cap.isOpened():
             raise VideoOpenError('Video Open Failed')
 
-        idx = 0
         frames = []
-        
         while cap.isOpened():
-            idx += 1
             ret, frame = cap.read()
             if ret:
+                # 動画フレームをPIL形式に変換し，前処理を行う
                 pil_img = Image.fromarray(frame)
                 pil_img = self.transform(pil_img)
                 frames.append(pil_img)
             else:
                 break
         
-        # 深層学習モデルへ入力するための形式に変換
+        # DNNモデルへ入力するための形式に変換
         X = torch.stack(frames, dim=0)
         X = X.permute(1,0,2,3)
         X = X.unsqueeze(0)
-        
-        self.model.eval()
         X = X.to(self.device)
         
+        # 推論を行う
+        self.model.eval()
         with torch.no_grad():
             out_predictions, _ = self.model(X)
             
-            # torch.Tensor形式からnumpy形式へ変換
+            # 推論結果をtorch.Tensor形式からnumpy形式へ変換
             out_predictions = out_predictions[0].cpu().numpy()
         
         return out_predictions

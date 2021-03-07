@@ -13,6 +13,7 @@ from python_src.InferenceModel import InferenceModel
 from python_src.myException import *
 
 def createApp(args):
+    # Flaskクラスのインスタンス生成
     app = Flask(__name__)
 
     # シークレットキー生成
@@ -34,7 +35,7 @@ def createApp(args):
         # コマンドライン引数で指定したディレクトリ内にある動画ファイルのファイルパスに関するリストを作成
         video_list = [video_path.split('/')[-1] for video_path in glob.glob(os.path.join(args.sample_video_dir,'*.(avi|mp4)'))]
 
-        # 選択したファイルに問題があった場合はエラーメッセージを表示させる
+        # 選択したファイルに問題があった場合はindex.htmlにエラーメッセージを表示させる
         error = session['error'] if 'error' in session else ''
 
         return render_template("index.html",
@@ -46,7 +47,8 @@ def createApp(args):
     def dataCheck():
         try:
             # プルダウンメニューで選択した動画のファイルパスを取得
-            video_path = os.path.join(args.sample_video_dir,request.form.get('select_video'))
+            video_name = request.form.get('select_video')
+            video_path = os.path.join(args.sample_video_dir,video_name)
 
             # 動画ファイルの推論
             tic = time.time()
@@ -67,7 +69,7 @@ def createApp(args):
         for index in sorted_indices[:10]:
             print_results_str.append('{}\t{} %'.format(cls_model.classes[index], round(pred[index]*100.0,3)))
 
-        session['error'] = ''
+        session['error'] = ''   # 問題なく推論が行われた場合，indexに表示させるエラーメッセージをクリア
         session['video'] = request.form['select_video']
         session['best_result'] = cls_model.classes[sorted_indices[0]]
         session['time'] = round(toc-tic,3)
@@ -78,6 +80,7 @@ def createApp(args):
     @app.route("/result", methods=['GET', 'POST'])
     def renderResult():
         if 'best_result' not in session:
+            # 推論結果を格納するセッション変数が存在しない場合，indexにリダイレクト
             return redirect(url_for('renderIndex'))
         else :
             return render_template("result.html",
