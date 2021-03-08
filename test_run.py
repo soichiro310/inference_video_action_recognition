@@ -28,7 +28,7 @@ def test_response_code_check(client, method, route, status_code):
     assert response.status_code == status_code
 
 @pytest.mark.parametrize("set_args, video_name, status_code", [
-    # ('--sample_video_dir ./sample_video', 'v_TennisSwing_g01_c01.avi', 302),
+    ('--sample_video_dir ./sample_video', 'v_TennisSwing_g01_c01.avi', 302),
     ('--sample_video_dir ./sample_video_empty', 'v_TennisSwing_g01_c01.avi', 302),
     ('--sample_video_dir ./sample_video', 'nothing_video.avi', 302),
 ])
